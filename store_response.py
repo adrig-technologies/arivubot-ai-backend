@@ -2,7 +2,8 @@ import uuid
 # from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_chroma import Chroma
+# from langchain_chroma import Chroma
+from langchain_community.vectorstores import Chroma
 # from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI
 from langchain_core.documents import Document
