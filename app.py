@@ -26,20 +26,11 @@ app.add_middleware(
 @api2_router.get("/links")
 async def scrape(request: Request, url: str):
     visited_links = set()
-
     async def link_stream():
         async for link_message in scrape_links(url, visited_links):
-            # Ensure correct format
             yield link_message
             await asyncio.sleep(0.1)
-
-    headers = {
-        "Content-Type": "text/event-stream; charset=utf-8",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-    }
-
-    return EventSourceResponse(link_stream(), headers=headers)
+    return EventSourceResponse(link_stream())
 
 class LinksRequest(BaseModel):
     links: List[str]
