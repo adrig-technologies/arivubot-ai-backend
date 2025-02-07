@@ -63,8 +63,8 @@ def store_test(text):
 
 def store_extra(id, text):
     collection_path = os.path.join(CHROMA_PATH, id)
-    print(collection_path, os.path.exists(collection_path))
-    if os.path.exists(collection_path):
+    print(collection_path, os.path.exists('/home/azureuser/srbackend/bts/srbackend/'+collection_path))
+    if os.path.exists('/home/azureuser/srbackend/bts/srbackend/'+collection_path):
         chroma_db = Chroma(persist_directory=CHROMA_PATH, collection_name=id, embedding_function=embeddings)
         print(os.path.exists(collection_path))
     else:
