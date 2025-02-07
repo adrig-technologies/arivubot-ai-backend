@@ -129,7 +129,7 @@ async def testing(questions:QuestionRequest):
     result = proper_query(questions.question, "dbfudovn","nvnobvneri")
     return {"data": result}
 
-@api2_router.get("/pages")
+@api2_router.get("/pageview")
 async def pageview(id:str):
     page=getpage(id)
     return page
