@@ -5,6 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 # from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI
+from langchain_core.documents import Document
 from pymongo import MongoClient
 from datetime import datetime, timezone
 import dotenv
@@ -62,10 +63,10 @@ def store_extra(id, text):
         chroma_db = Chroma(persist_directory=CHROMA_PATH, collection_name=id, embedding_function=embeddings)
     else:
         text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-        text_chunks = text_splitter.split_documents(text)
+        text_chunks = text_splitter.split_documents([Document(page_content=text)])
         chroma_db = Chroma.from_documents(text_chunks, embeddings, persist_directory=CHROMA_PATH, collection_name=id)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    text_chunks = text_splitter.split_documents(text)
+    text_chunks = text_splitter.split_documents([Document(page_content=text)])
     chroma_db.add_documents(text_chunks)
     chroma_db.persist()
 
