@@ -52,6 +52,8 @@ def store_text(text, collection_name="all-my-documents"):
     website_id = str(uuid.uuid4())
     collection = client.get_or_create_collection(collection_name)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    if isinstance(text, list):
+        text = " ".join(text)
     text_chunks = text_splitter.split_text(text)
     collection.add(
         documents=text_chunks,
