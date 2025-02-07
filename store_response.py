@@ -58,23 +58,15 @@ def store_test(text):
 
 def store_extra(id, text):
     collection_path = os.path.join(CHROMA_PATH, id)
-
-    # Check if the collection exists
     if os.path.exists(collection_path):
-        # If it exists, load the existing collection
-        chroma_db = Chroma(persist_directory=CHROMA_PATH, collection_name=id)
+        chroma_db = Chroma(persist_directory=CHROMA_PATH, collection_name=id, embedding_function=embeddings)
     else:
-        # If not, create a new collection
-        chroma_db = Chroma.from_documents([], embeddings, persist_directory=CHROMA_PATH, collection_name=id)
-
-    # Split the new text into chunks
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+        text_chunks = text_splitter.split_documents(text)
+        chroma_db = Chroma.from_documents(text_chunks, embeddings, persist_directory=CHROMA_PATH, collection_name=id)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     text_chunks = text_splitter.split_documents(text)
-
-    # Add new chunks to the existing collection
     chroma_db.add_documents(text_chunks)
-
-    # Persist the collection
     chroma_db.persist()
 
     return id
