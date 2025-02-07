@@ -22,15 +22,24 @@ app.add_middleware(
     allow_headers=["*"], 
 )
 
-@api2_router.get("/links")
+
+@app.get("/chatlaps/links")
 async def scrape(request: Request, url: str):
     visited_links = set()
 
     async def link_stream():
         async for link_message in scrape_links(url, visited_links):
-            yield link_message
-            await asyncio.sleep(0.1)  
-    return EventSourceResponse(link_stream())
+            # Ensure correct format
+            yield f"data: {link_message}\n\n"
+            await asyncio.sleep(0.1)
+
+    headers = {
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+    }
+
+    return EventSourceResponse(link_stream(), headers=headers)
 
 class LinksRequest(BaseModel):
     links: List[str]
