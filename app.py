@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, APIRouter
-from fastapi.middleware.cors import CORSMiddleware
+
 from sse_starlette import EventSourceResponse
 from fastapi.responses import JSONResponse
 import asyncio
@@ -10,18 +10,8 @@ from typing import List
 from scrape_links import scrape_links, scrape_text
 from store_response import store_extra, store_text, proper_query, notification, chat_activity, delete_chat_history,get_prompt,update_prompt,store_test,getpage,deletechroma
 
-app = FastAPI()
 
 api2_router = APIRouter()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  
-    allow_credentials=True,
-    allow_methods=["*"],  
-    allow_headers=["*"], 
-)
-
 
 @api2_router.get("/links")
 async def scrape(request: Request, url: str):
