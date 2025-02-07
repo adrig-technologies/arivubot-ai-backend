@@ -65,7 +65,10 @@ def store_test(text):
 def store_extra(id, text):
     collection_path = os.path.join(CHROMA_PATH)
 
+
     client = Client()
+    print(client.list_collections())
+    return ''
     collection = client.get_collection(id)
     print(collection)
     # if os.path.exists(collection_path):
