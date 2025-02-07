@@ -30,7 +30,7 @@ async def scrape(request: Request, url: str):
     async def link_stream():
         async for link_message in scrape_links(url, visited_links):
             # Ensure correct format
-            yield f"data: {link_message}\n\n"
+            yield link_message
             await asyncio.sleep(0.1)
 
     headers = {
