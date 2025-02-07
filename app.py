@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 
-@app.get("/chatlaps/links")
+@api2_router.get("/links")
 async def scrape(request: Request, url: str):
     visited_links = set()
 
