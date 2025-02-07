@@ -62,7 +62,7 @@ def store_test(text):
 
 
 def store_extra(id, text):
-    collection_path = os.path.join(CHROMA_PATH, id)
+    collection_path = os.path.join(CHROMA_PATH)
     print(collection_path, os.path.exists(collection_path))
     if os.path.exists(collection_path):
         chroma_db = Chroma(persist_directory=CHROMA_PATH, collection_name=id, embedding_function=embeddings)
@@ -74,8 +74,6 @@ def store_extra(id, text):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     text_chunks = text_splitter.split_documents([Document(page_content=text)])
     chroma_db.add_documents(text_chunks)
-    chroma_db.persist()
-
     return id
 
 
