@@ -3,6 +3,7 @@ import uuid
 from langchain_openai import OpenAIEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
+from chromadb import Client
 # from langchain_community.vectorstores import Chroma
 # from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI
@@ -63,17 +64,20 @@ def store_test(text):
 
 def store_extra(id, text):
     collection_path = os.path.join(CHROMA_PATH)
-    print(collection_path, os.path.exists(collection_path))
-    if os.path.exists(collection_path):
-        chroma_db = Chroma(persist_directory=CHROMA_PATH, collection_name=id, embedding_function=embeddings)
-        print(os.path.exists(collection_path))
-    else:
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-        text_chunks = text_splitter.split_documents([Document(page_content=text)])
-        chroma_db = Chroma.from_documents(text_chunks, embeddings, persist_directory=CHROMA_PATH, collection_name=id)
+
+    client = Client()
+    collection = client.get_collection(id)
+    print(collection)
+    # if os.path.exists(collection_path):
+    #     chroma_db = Chroma(persist_directory=CHROMA_PATH, collection_name=id, embedding_function=embeddings)
+    #     print(os.path.exists(collection_path))
+    # else:
+    #     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+    #     text_chunks = text_splitter.split_documents([Document(page_content=text)])
+    #     chroma_db = Chroma.from_documents(text_chunks, embeddings, persist_directory=CHROMA_PATH, collection_name=id)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     text_chunks = text_splitter.split_documents([Document(page_content=text)])
-    chroma_db.add_documents(text_chunks)
+    collection.add_documents(text_chunks)
     return id
 
 

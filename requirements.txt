@@ -10,3 +10,4 @@ langchain-openai
 openai
 pymongo
 faiss-cpu
+chromadb
