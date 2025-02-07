@@ -49,6 +49,7 @@ async def scrape(request: LinksRequest):
     return {"chatbotId": collection_id}
 
 class TextRequest(BaseModel):
+    chatbotId: str
     textData: str
 
 @api2_router.post("/texttrain")
