@@ -36,31 +36,29 @@ mongoclient = MongoClient(MONGO_URI)
 db = mongoclient.chatbot
 
 
-# def store_text(text):
-#     website_id = str(uuid.uuid4())
-#
-#     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-#     text_chunks = text_splitter.split_documents(text)
-#
-#     Chroma.from_documents(text_chunks, embeddings, persist_directory=CHROMA_PATH, collection_name=website_id)
-#     # db = FAISS.from_documents(text_chunks, embeddings)
-#     # db.save_local(folder_path=FAISS_PATH, index_name=website_id)
-#     return website_id
-
-def store_text(text, collection_name="all-my-documents"):
-    client = Client()
+def store_text(text):
     website_id = str(uuid.uuid4())
-    collection = client.get_or_create_collection(collection_name)
+
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-    if isinstance(text, list):
-        text = " ".join(text)
-    text_chunks = text_splitter.split_text(text)
-    collection.add(
-        documents=text_chunks,
-        metadatas=[{"source": website_id} for _ in text_chunks],
-        ids=[f"{website_id}_{i}" for i in range(len(text_chunks))],
-    )
+    text_chunks = text_splitter.split_documents(text)
+
+    Chroma.from_documents(text_chunks, embeddings, persist_directory=CHROMA_PATH, collection_name=website_id)
+    # db = FAISS.from_documents(text_chunks, embeddings)
+    # db.save_local(folder_path=FAISS_PATH, index_name=website_id)
     return website_id
+
+# def store_text(text, collection_name="all-my-documents"):
+#
+#     website_id = str(uuid.uuid4())
+#     collection = client.get_or_create_collection(collection_name)
+#     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+#     text_chunks = text_splitter.split_text(text)
+#     collection.add(
+#         documents=text_chunks,
+#         metadatas=[{"source": website_id} for _ in text_chunks],
+#         ids=[f"{website_id}_{i}" for i in range(len(text_chunks))],
+#     )
+#     return website_id
 def store_test(text):
     website_id = "nvnobvneri"
     collection_path = os.path.join(CHROMA_PATH, website_id)
