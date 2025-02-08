@@ -33,7 +33,7 @@ llm = ChatOpenAI(model='gpt-4o-mini')
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key=OPENAI_API_KEY)
 
 mongoclient = MongoClient(MONGO_URI)
-db = mongoclient.chatbot
+db = mongoclient.arivubotDB
 
 
 def store_text(text):
@@ -191,7 +191,6 @@ def chat_history(userid, chatbotid):
 
 def getpage(id):
     result = db.Chatbots.find_one({"chatbotId": id}, {"_id": 0, 'userid': 0})
-    print(result)
     if not result:
         return "Error: chatbotid not found in MongoDB."
     return result
