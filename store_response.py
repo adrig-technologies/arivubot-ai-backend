@@ -190,7 +190,7 @@ def chat_history(userid, chatbotid):
 
 
 def getpage(id):
-    result1 = db.Chatbot
+    result1 = db.Chatbots
     result = list(result1.find({"chatbotId": id}, {"_id": 0, 'userid': 0}))
     if not result:
         return "Error: chatbotid not found in MongoDB."
