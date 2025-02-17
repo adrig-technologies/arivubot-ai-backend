@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Request, APIRouter
-
+from fastapi import FastAPI, Request, APIRouter, Query
+from starlette.background import BackgroundTasks
 from sse_starlette import EventSourceResponse
 from fastapi.responses import JSONResponse
 import asyncio
@@ -7,23 +7,38 @@ import importlib
 import prompts
 from pydantic import BaseModel
 from typing import List
-from scrape_links import scrape_links, scrape_text
+from scrape_links import scrape_links, scrape_text, save_links_to_db, create_chatbot
 from store_response import store_extra, store_text, proper_query, notification, chat_activity, delete_chat_history,get_prompt,update_prompt,store_test,getpage,deletechroma
 
 
 api2_router = APIRouter()
 
+# @api2_router.get("/links")
+# async def scrape(request: Request, url: str):
+#     visited_links = set()
+#     async def link_stream():
+#         async for link_message in scrape_links(url, visited_links):
+#             yield link_message
+#             await asyncio.sleep(0.1)
+#     return EventSourceResponse(link_stream())
+
 @api2_router.get("/links")
-async def scrape(request: Request, url: str):
+async def scrape(request: Request, url: str , user_id: str ,chatbotName: str , background_tasks: BackgroundTasks = None): 
     visited_links = set()
+
     async def link_stream():
-        async for link_message in scrape_links(url, visited_links):
-            yield link_message
+        async for link in scrape_links(url, visited_links):
+            yield link
             await asyncio.sleep(0.1)
+        print(visited_links)
+        await save_links_to_db(user_id, visited_links)
+        await create_chatbot(user_id, chatbotName, 'weblink')
     return EventSourceResponse(link_stream())
+
 
 class LinksRequest(BaseModel):
     links: List[str]
+    chatbotId: str
 
 class LinkRequest(BaseModel):
     url:str
@@ -43,9 +58,11 @@ async def scrape(request: LinkRequest):
 
 @api2_router.post("/scrape")
 async def scrape(request: LinksRequest):
-    links = request.links  # This will get the links from the body
-    text_data = scrape_text(links)
-    collection_id = store_text(text_data)
+    links = request.links  
+    chatbotId = request.chatbotId
+    
+    text_data = await scrape_text(links,chatbotId)
+    collection_id = await store_text(text_data,chatbotId)
     return {"chatbotId": collection_id}
 
 class TextRequest(BaseModel):

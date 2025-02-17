@@ -11,3 +11,5 @@ openai
 pymongo
 faiss-cpu
 chromadb
+motor
+uuid

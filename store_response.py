@@ -16,6 +16,7 @@ import openai
 import json
 # import app
 import prompts
+from motor.motor_asyncio import AsyncIOMotorClient
 
 CHROMA_PATH = "/home/azureuser/srbackend/bts/srbackend/store_chroma"
 FAISS_PATH = "store_faiss"
@@ -32,19 +33,22 @@ llm = ChatOpenAI(model='gpt-4o-mini')
 # embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 embeddings = OpenAIEmbeddings(model="text-embedding-3-small", api_key=OPENAI_API_KEY)
 
-mongoclient = MongoClient(MONGO_URI)
+mongoclient = AsyncIOMotorClient(MONGO_URI)
 db = mongoclient.arivubotDB
 
 
-def store_text(text):
-    website_id = str(uuid.uuid4())
-
+async def store_text(text,chatbotId):
+    website_id = chatbotId
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     text_chunks = text_splitter.split_documents(text)
 
     Chroma.from_documents(text_chunks, embeddings, persist_directory=CHROMA_PATH, collection_name=website_id)
-    # db = FAISS.from_documents(text_chunks, embeddings)
-    # db.save_local(folder_path=FAISS_PATH, index_name=website_id)
+    
+    chatbots_collection = db.chatbots
+    await chatbots_collection.update_one(
+    {"chatbotId": website_id},  
+    {"$set": {"botState": "playIt"}}  
+    )
     return website_id
 
 # def store_text(text, collection_name="all-my-documents"):
