@@ -19,8 +19,9 @@ async def process_links(url, user_id, chatbot_name):
     print("asdadsdasdasda")
     async for link in scrape_links(url, visited_links):
         visited_links.add(link)
-    await save_links_to_db(user_id, visited_links)
-    await create_chatbot(user_id, chatbot_name, 'weblink')
+    chatBotId = await create_chatbot(user_id, chatbot_name, 'weblink')
+    await save_links_to_db(chatBotId, visited_links)
+    
 
 
 @api2_router.get("/links")

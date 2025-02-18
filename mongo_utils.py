@@ -14,11 +14,11 @@ db = client.arivubotDB
 def get_db():
     return db
 
-async def save_links_to_db(user_id, links):
+async def save_links_to_db(chatBotId, links):
     """Save unique links in MongoDB under the given user_id."""
     collection = db.weblink
     await collection.update_one(
-        {"user_id": user_id}, 
+        {"chatBotId": chatBotId}, 
         {"$addToSet": {"links": {"$each": list(links)}}}, 
         upsert=True
     )
@@ -49,7 +49,7 @@ async def create_chatbot(user_id, name, flag):
         "updatedAt": current_time,
     }
     result = await chatbots_collection.insert_one(new_chatbot)
-    return result
+    return chatbot_id
 
 async def update_chatbot_state(chatbot_id, state):
     """Update chatbot state in the database."""
