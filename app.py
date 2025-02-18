@@ -24,14 +24,17 @@ async def process_links(url, user_id, chatbot_name):
 
 @api2_router.get("/links")
 async def scrape(request: Request, url: str , user_id: str ,chatbotName: str , background_tasks: BackgroundTasks = None): 
-    visited_links = set()
+    try:
+        visited_links = set()
 
-    async def link_stream():
-        async for link in scrape_links(url, visited_links):
-            yield link
-            await asyncio.sleep(0.1)
-        background_tasks.add_task(process_links, url, user_id, chatbotName)
-    return EventSourceResponse(link_stream())
+        async def link_stream():
+            async for link in scrape_links(url, visited_links):
+                yield link
+                await asyncio.sleep(0.1)
+            background_tasks.add_task(process_links, url, user_id, chatbotName)
+        return EventSourceResponse(link_stream())
+    except Exception as e:
+        print("The error is: ",e)
 
 
 class LinksRequest(BaseModel):
@@ -44,14 +47,17 @@ class LinkRequest(BaseModel):
 # Combined API endpoint
 @api2_router.post("/linktest")
 async def scrape(request: LinkRequest):
-    url = request.url
-    visited_links = set()
-    links = []
-    async for link_message in scrape_links(url, visited_links):
-        links.append(link_message)
-    text_data = scrape_text(links)
-    collection_id = store_test(text_data)
-    return {"chatbotId": collection_id}
+    try:
+        url = request.url
+        visited_links = set()
+        links = []
+        async for link_message in scrape_links(url, visited_links):
+            links.append(link_message)
+        text_data = scrape_text(links)
+        collection_id = store_test(text_data)
+        return {"chatbotId": collection_id}
+    except Exception as e:
+        print("The error is: ",e)
 
 
 @api2_router.post("/scrape")
