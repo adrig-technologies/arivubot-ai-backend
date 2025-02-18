@@ -29,13 +29,19 @@ async def scrape(request: Request, url: str , user_id: str ,chatbotName: str , b
         visited_links = set()
 
         async def link_stream():
-            async for link in scrape_links(url, visited_links):
-                yield link
-                await asyncio.sleep(0.1)
-            background_tasks.add_task(process_links, url, user_id, chatbotName)
+            try:
+                async for link in scrape_links(url, visited_links):
+                    yield link
+                    await asyncio.sleep(0.1)
+            except GeneratorExit:  # This triggers when the client disconnects
+                print(f"Client disconnected: Stopping data stream for {user_id}")
+            finally:
+                # Always ensure the data is saved
+                background_tasks.add_task(process_links, url, user_id, chatbotName)
+
         return EventSourceResponse(link_stream())
     except Exception as e:
-        print("The error is: ",e)
+        print("The error is: ", e)
 
 
 class LinksRequest(BaseModel):
