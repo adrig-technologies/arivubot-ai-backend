@@ -1,5 +1,4 @@
-from fastapi import FastAPI, Request, APIRouter, Query
-from starlette.background import BackgroundTasks
+from fastapi import FastAPI, Request, APIRouter, BackgroundTasks
 from sse_starlette import EventSourceResponse
 from fastapi.responses import JSONResponse
 import asyncio
@@ -7,20 +6,21 @@ import importlib
 import prompts
 from pydantic import BaseModel
 from typing import List
-from scrape_links import scrape_links, scrape_text, save_links_to_db, create_chatbot
+from scrape_links import scrape_links, scrape_text
+from mongo_utils import save_links_to_db, create_chatbot
 from store_response import store_extra, store_text, proper_query, notification, chat_activity, delete_chat_history,get_prompt,update_prompt,store_test,getpage,deletechroma
 
 
 api2_router = APIRouter()
 
-# @api2_router.get("/links")
-# async def scrape(request: Request, url: str):
-#     visited_links = set()
-#     async def link_stream():
-#         async for link_message in scrape_links(url, visited_links):
-#             yield link_message
-#             await asyncio.sleep(0.1)
-#     return EventSourceResponse(link_stream())
+async def process_links(url, user_id, chatbot_name):
+    """Process scraped links and persist data even if the client disconnects."""
+    visited_links = set()
+    async for link in scrape_links(url, visited_links):
+        visited_links.add(link)
+    await save_links_to_db(user_id, visited_links)
+    await create_chatbot(user_id, chatbot_name, 'weblink')
+
 
 @api2_router.get("/links")
 async def scrape(request: Request, url: str , user_id: str ,chatbotName: str , background_tasks: BackgroundTasks = None): 
@@ -30,9 +30,7 @@ async def scrape(request: Request, url: str , user_id: str ,chatbotName: str , b
         async for link in scrape_links(url, visited_links):
             yield link
             await asyncio.sleep(0.1)
-        print(visited_links)
-        await save_links_to_db(user_id, visited_links)
-        await create_chatbot(user_id, chatbotName, 'weblink')
+        background_tasks.add_task(process_links, url, user_id, chatbotName)
     return EventSourceResponse(link_stream())
 
 
