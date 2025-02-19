@@ -73,13 +73,13 @@ async def scrape(request: LinksRequest):
     try:
         links = request.links  
         chatbotId = request.chatbotId
-       
-    except Exception as e:
-            print("The error is: ",e)
-    finally:
-        text_data = await scrape_text(links,chatbotId)
-        collection_id = await store_text(text_data,chatbotId)
+        text_data = await scrape_text(links, chatbotId)
+        collection_id = await store_text(text_data, chatbotId)
         return {"chatbotId": collection_id}
+    
+    except Exception as e:
+        print("Error training model:", e)
+        return JSONResponse(content={"error": "Error training model"}, status_code=500)
 
 class TextRequest(BaseModel):
     chatbotId: str
