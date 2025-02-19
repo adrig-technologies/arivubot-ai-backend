@@ -70,12 +70,16 @@ async def scrape(request: LinkRequest):
 
 @api2_router.post("/scrape")
 async def scrape(request: LinksRequest):
-    links = request.links  
-    chatbotId = request.chatbotId
-    
-    text_data = await scrape_text(links,chatbotId)
-    collection_id = await store_text(text_data,chatbotId)
-    return {"chatbotId": collection_id}
+    try:
+        links = request.links  
+        chatbotId = request.chatbotId
+       
+    except Exception as e:
+            print("The error is: ",e)
+    finally:
+        text_data = await scrape_text(links,chatbotId)
+        collection_id = await store_text(text_data,chatbotId)
+        return {"chatbotId": collection_id}
 
 class TextRequest(BaseModel):
     chatbotId: str
