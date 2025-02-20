@@ -67,15 +67,22 @@ async def scrape(request: LinkRequest):
     except Exception as e:
         print("The error is: ",e)
 
+async def background_scrape_and_store(links, chatbotId):
+    """Scrape text from links and store it, ensuring it runs to completion."""
+    try:
+        text_data = await scrape_text(links, chatbotId)
+        collection_id = await store_text(text_data, chatbotId)
+        print(f"Scraping completed successfully for chatbotId: {chatbotId}")
+    except Exception as e:
+        print(f"Error in background processing: {e}")
 
 @api2_router.post("/scrape")
-async def scrape(request: LinksRequest):
+async def scrape(request: LinksRequest, background_tasks: BackgroundTasks):
     try:
         links = request.links  
         chatbotId = request.chatbotId
-        text_data = await scrape_text(links, chatbotId)
-        collection_id = await store_text(text_data, chatbotId)
-        return {"chatbotId": collection_id}
+        background_tasks.add_task(background_scrape_and_store, links, chatbotId)
+        return {"message": "Scraping started, data will be stored once completed", "chatbotId": chatbotId}
     
     except Exception as e:
         print("Error training model:", e)

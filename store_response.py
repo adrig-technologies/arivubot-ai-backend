@@ -18,6 +18,7 @@ import json
 import prompts
 from motor.motor_asyncio import AsyncIOMotorClient
 
+from mongo_utils import update_chatbot_state
 CHROMA_PATH = "/home/azureuser/srbackend/bts/srbackend/store_chroma"
 FAISS_PATH = "store_faiss"
 
@@ -41,14 +42,8 @@ async def store_text(text,chatbotId):
     website_id = chatbotId
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
     text_chunks = text_splitter.split_documents(text)
-
     Chroma.from_documents(text_chunks, embeddings, persist_directory=CHROMA_PATH, collection_name=website_id)
-    
-    chatbots_collection = db.chatbots
-    await chatbots_collection.update_one(
-    {"chatbotId": website_id},  
-    {"$set": {"botState": "playIt"}}  
-    )
+    await update_chatbot_state(website_id,"playIt")
     return website_id
 
 # def store_text(text, collection_name="all-my-documents"):

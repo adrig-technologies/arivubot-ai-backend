@@ -4,6 +4,7 @@ from datetime import datetime
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 import dotenv
+from urllib.parse import urlparse
 
 dotenv.load_dotenv()
 
@@ -16,10 +17,15 @@ def get_db():
 
 async def save_links_to_db(chatBotId, links):
     """Save unique links in MongoDB under the given user_id."""
+    domain = urlparse(list(links)[0]).netloc.replace("www.", "")
     collection = db.weblink
+    print(domain)
     await collection.update_one(
-        {"chatBotId": chatBotId}, 
-        {"$addToSet": {"links": {"$each": list(links)}}}, 
+        {"chatBotId": chatBotId, "domain": domain}, 
+        {
+            "$setOnInsert": {"chatBotId": chatBotId, "domain": domain},  # Ensure document creation
+            "$addToSet": {"links": {"$each": list(links)}}
+        }, 
         upsert=True
     )
 
