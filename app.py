@@ -28,7 +28,7 @@ async def process_links(url, user_id, chatbot_name,chatbotId=None):
 async def scrape(request: Request, url: str , user_id: str ,chatbotName: str ,chatbotId: str , background_tasks: BackgroundTasks = None): 
     try:
         visited_links = set()
-
+        print('links are fetching')
         async def link_stream():
             try:
                 async for link in scrape_links(url, visited_links):
@@ -38,6 +38,7 @@ async def scrape(request: Request, url: str , user_id: str ,chatbotName: str ,ch
                 print(f"Client disconnected: Stopping data stream for {user_id}")
             finally:
                 # Always ensure the data is saved
+                print('finally')
                 background_tasks.add_task(process_links, url, user_id, chatbotName,chatbotId)
 
         return EventSourceResponse(link_stream())
