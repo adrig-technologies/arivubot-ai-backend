@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, APIRouter, BackgroundTasks
+from fastapi import FastAPI, Request, APIRouter, BackgroundTasks, Query
 from sse_starlette import EventSourceResponse
 from fastapi.responses import JSONResponse
 import asyncio
@@ -9,7 +9,7 @@ from typing import List
 from scrape_links import scrape_links, scrape_text
 from mongo_utils import save_links_to_db, create_chatbot
 from store_response import store_extra, store_text, proper_query, notification, chat_activity, delete_chat_history,get_prompt,update_prompt,store_test,getpage,deletechroma
-
+from typing import Optional
 
 api2_router = APIRouter()
 
@@ -26,7 +26,7 @@ async def process_links(url, user_id, chatbot_name,chatbotId=None):
 
 @api2_router.get("/links")
 async def scrape(
-    request: Request, url: str, user_id: str, chatbotName: str, chatbotId: str, background_tasks: BackgroundTasks
+    request: Request, url: str, user_id: str, chatbotName: str, chatbotId: Optional[str] = Query(None), background_tasks: BackgroundTasks
 ): 
     try:
         visited_links = set()
