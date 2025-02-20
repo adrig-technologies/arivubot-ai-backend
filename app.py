@@ -13,16 +13,14 @@ from store_response import store_extra, store_text, proper_query, notification, 
 
 api2_router = APIRouter()
 
-async def process_links(url, user_id, chatbot_name,chatbotId):
+async def process_links(url, user_id, chatbot_name,chatbotId=None):
     """Process scraped links and persist data even if the client disconnects."""
     visited_links = set()
-    print("asdadsdasdasda")
     async for link in scrape_links(url, visited_links):
         visited_links.add(link)
-    chatBotId = await create_chatbot(user_id, chatbot_name, 'weblink',chatbotId)
+    chatBotId = chatbotId if chatbotId else await create_chatbot(user_id, chatbot_name, 'weblink')
     await save_links_to_db(chatBotId, visited_links)
     
-
 
 @api2_router.get("/links")
 async def scrape(request: Request, url: str , user_id: str ,chatbotName: str ,chatbotId: str , background_tasks: BackgroundTasks = None): 
