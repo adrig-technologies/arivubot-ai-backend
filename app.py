@@ -15,10 +15,12 @@ api2_router = APIRouter()
 
 async def process_links(url, user_id, chatbot_name,chatbotId=None):
     """Process scraped links and persist data even if the client disconnects."""
+    print("data called")
     visited_links = set()
     async for link in scrape_links(url, visited_links):
         visited_links.add(link)
     chatBotId = chatbotId if chatbotId else await create_chatbot(user_id, chatbot_name, 'weblink')
+    print("data saved")
     await save_links_to_db(chatBotId, visited_links)
     
 
