@@ -26,7 +26,7 @@ async def process_links(url, user_id, chatbot_name,chatbotId=None):
 
 @api2_router.get("/links")
 async def scrape(
-    request: Request, url: str, user_id: str, chatbotName: str, chatbotId: Optional[str] = Query(None), background_tasks: BackgroundTasks
+    request: Request, url: str, user_id: str, chatbotName: str, chatbotId: Optional[str] = Query(None)
 ): 
     try:
         visited_links = set()
