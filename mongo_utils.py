@@ -29,10 +29,10 @@ async def save_links_to_db(chatBotId, links):
         upsert=True
     )
 
-async def create_chatbot(user_id, name, flag):
+async def create_chatbot(user_id, name, flag, chatbotId=None):
     """Create a new chatbot and store it in the database."""
     chatbots_collection = db.chatbots
-    chatbot_id = str(uuid.uuid4())
+    chatbot_id = chatbotId if chatbotId else str(uuid.uuid4())
     current_time = datetime.now().isoformat()
     new_chatbot = {
         "name": name,

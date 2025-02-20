@@ -13,19 +13,19 @@ from store_response import store_extra, store_text, proper_query, notification, 
 
 api2_router = APIRouter()
 
-async def process_links(url, user_id, chatbot_name):
+async def process_links(url, user_id, chatbot_name,chatbotId):
     """Process scraped links and persist data even if the client disconnects."""
     visited_links = set()
     print("asdadsdasdasda")
     async for link in scrape_links(url, visited_links):
         visited_links.add(link)
-    chatBotId = await create_chatbot(user_id, chatbot_name, 'weblink')
+    chatBotId = await create_chatbot(user_id, chatbot_name, 'weblink',chatbotId)
     await save_links_to_db(chatBotId, visited_links)
     
 
 
 @api2_router.get("/links")
-async def scrape(request: Request, url: str , user_id: str ,chatbotName: str , background_tasks: BackgroundTasks = None): 
+async def scrape(request: Request, url: str , user_id: str ,chatbotName: str ,chatbotId: str , background_tasks: BackgroundTasks = None): 
     try:
         visited_links = set()
 
@@ -38,7 +38,7 @@ async def scrape(request: Request, url: str , user_id: str ,chatbotName: str , b
                 print(f"Client disconnected: Stopping data stream for {user_id}")
             finally:
                 # Always ensure the data is saved
-                background_tasks.add_task(process_links, url, user_id, chatbotName)
+                background_tasks.add_task(process_links, url, user_id, chatbotName,chatbotId)
 
         return EventSourceResponse(link_stream())
     except Exception as e:
