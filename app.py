@@ -33,7 +33,8 @@ async def scrape(
         print("Links are fetching")
 
         # Start processing links in the background immediately
-        background_tasks.add_task(process_links, url, user_id, chatbotName, chatbotId)
+        # background_tasks.add_task(process_links, url, user_id, chatbotName, chatbotId)
+        asyncio.create_task(process_links(url, user_id, chatbotName, chatbotId))
 
         async def link_stream():
             try:
