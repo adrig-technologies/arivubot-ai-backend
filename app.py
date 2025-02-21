@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 import asyncio
 import importlib
 import prompts
+import uuid
 from pydantic import BaseModel
 from typing import List
 from scrape_links import scrape_links, scrape_text
@@ -84,9 +85,11 @@ async def background_scrape_and_store(links, chatbotId):
 async def scrape(request: LinksRequest, background_tasks: BackgroundTasks):
     try:
         links = request.links  
-        chatbotId = request.chatbotId
-        background_tasks.add_task(background_scrape_and_store, links, chatbotId)
-        return {"message": "Scraping started, data will be stored once completed", "chatbotId": chatbotId}
+        chatbot_id = request.chatbotId if request.chatbotId != "null" else str(uuid.uuid4())
+        if request.chatbotId == "null":
+            create_chatbot(request.userId, request.chatbot_name, "modelTrain", chatbot_id)
+        asyncio.create_task(background_scrape_and_store(links, chatbot_id))
+        return {"message": "Scraping started, data will be stored once completed", "chatbotId": request.get("chatbotId")}
     
     except Exception as e:
         print("Error training model:", e)
